@@ -442,7 +442,7 @@ class Missile(pygame.sprite.Sprite):
             is_stealth = getattr(self.target, 'is_stealth', False)
 
             if dist <= 200 and not is_stealth: # hard burn when close to target
-                self.acceleration_magnitude = ((100 * 9.80665) / 360.0) * 0.67
+                self.acceleration_magnitude = ((100 * 9.80665) / 360.0) * 0.5
                 if to_target.length_squared() > 0:
                     desired_dir = to_target.normalize()
                     speed = self.velocity.length() + self.acceleration_magnitude
@@ -450,7 +450,7 @@ class Missile(pygame.sprite.Sprite):
                     speed = min(speed, max_speed_pix)
                     self.velocity = desired_dir * speed
             else:
-                self.acceleration_magnitude = ((40 * 9.80665) / 360.0) * 0.67
+                self.acceleration_magnitude = ((40 * 9.80665) / 360.0) * 0.5
                 if to_target.length_squared() > 0:
                     desired_dir = to_target.normalize()
                     current_dir = self.velocity.normalize() if self.velocity.length_squared() > 0 else desired_dir
@@ -483,22 +483,22 @@ class Missile(pygame.sprite.Sprite):
 
 class LightTorpedo(Missile):
     def __init__(self, x, y, angle, target, is_player=True, initial_velocity=None):
-        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=40, hp=2, max_speed=440)
+        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=40, hp=2, max_speed=385)
 
 
 class MediumTorpedo(Missile):
     def __init__(self, x, y, angle, target, is_player=True, initial_velocity=None):
-        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=70, hp=5, max_speed=400)
+        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=70, hp=4, max_speed=350)
 
 
 class HeavyTorpedo(Missile):
     def __init__(self, x, y, angle, target, is_player=True, initial_velocity=None):
-        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=90, hp=4, max_speed=395)
+        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=90, hp=4, max_speed=295)
 
 
 class NukeTorpedo(Missile):
     def __init__(self, x, y, angle, target, is_player=True, initial_velocity=None):
-        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=300, hp=12, max_speed=378)
+        super().__init__(x, y, angle, target, is_player, initial_velocity, damage=300, hp=12, max_speed=278)
 
 
 def create_ship_surface(length, height, team):
@@ -571,11 +571,11 @@ class Ship(pygame.sprite.Sprite): #parent class of all ships
                 if sub["status"] == "destroyed":
                     continue
                 
-                armor_factor = 1.0 - (self.armor / 100.0)
+                armor_factor = 1 / (1 + (self.armor/100))
                 if armor_factor <= 0:
                     armor_factor = 0.01
                 
-                sub_dmg = amount * (1.0 / armor_factor)
+                sub_dmg = amount * armor_factor
                 sub["hp"] -= sub_dmg
                 if sub["hp"] <= 0:
                     sub["hp"] = 0
@@ -752,7 +752,7 @@ def update_ai_ship(ship, target_pos, target_obj, missiles_group):
 # MCRN
 class RedPatrolDestroyer(Ship): #morrigan
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=34, height=16, armor=6, hull=90, max_speed=210, jerk=0.8, is_player=is_player, team="red")
+        super().__init__(x, y, length=34, height=16, armor=10, hull=110, max_speed=210, jerk=0.8, is_player=is_player, team="red")
         self.ship_type = "MCRN Morrigan-class"
         pdc_offsets = [pygame.Vector2(14, 0), pygame.Vector2(0, -6), pygame.Vector2(0, 6), pygame.Vector2(-12, -4), pygame.Vector2(-12, 4)]
         railgun_offsets = []
@@ -765,7 +765,7 @@ class RedPatrolDestroyer(Ship): #morrigan
 
 class RedLightFrigate(Ship): # oh my god its the rocinnate
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=44, height=20, armor=12, hull=130, max_speed=160, jerk=0.65, is_player=is_player, team="red")
+        super().__init__(x, y, length=44, height=20, armor=15, hull=175, max_speed=160, jerk=0.65, is_player=is_player, team="red")
         self.ship_type = "MCRN Corvette-Class"
         pdc_offsets = [pygame.Vector2(18, 0), pygame.Vector2(6, -8), pygame.Vector2(6, 8), pygame.Vector2(-6, -8), pygame.Vector2(-6, 8), pygame.Vector2(-18, -4), pygame.Vector2(-18, 4)]
         railgun_offsets = []
@@ -778,7 +778,7 @@ class RedLightFrigate(Ship): # oh my god its the rocinnate
 
 class RedHeavyFrigate(Ship): # Unnamed MCRN Frigate
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=54, height=24, armor=18, hull=170, max_speed=140, jerk=0.55, is_player=is_player, team="red")
+        super().__init__(x, y, length=54, height=24, armor=22.5, hull=250, max_speed=140, jerk=0.55, is_player=is_player, team="red")
         self.ship_type = "MCRN Heavy Frigate"
         pdc_offsets = [pygame.Vector2(22, 0), pygame.Vector2(8, -10), pygame.Vector2(8, 10), pygame.Vector2(-6, -10), pygame.Vector2(-6, 10), pygame.Vector2(-20, -6), pygame.Vector2(-20, 6)]
         railgun_offsets = [pygame.Vector2(10, 0)]
@@ -791,7 +791,7 @@ class RedHeavyFrigate(Ship): # Unnamed MCRN Frigate
 
 class RedDestroyer(Ship): # Unnamed MCRN destroyer
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=64, height=28, armor=20, hull=200, max_speed=130, jerk=0.5, is_player=is_player, team="red")
+        super().__init__(x, y, length=64, height=28, armor=35, hull=350, max_speed=130, jerk=0.5, is_player=is_player, team="red")
         self.ship_type = "MCRN Destroyer"
         pdc_offsets = [pygame.Vector2(26, 0), pygame.Vector2(12, -12), pygame.Vector2(12, 12), pygame.Vector2(-4, -12), pygame.Vector2(-4, 12), pygame.Vector2(-24, -8), pygame.Vector2(-24, 8)]
         railgun_offsets = [pygame.Vector2(12, -4), pygame.Vector2(12, 4)]
@@ -804,7 +804,7 @@ class RedDestroyer(Ship): # Unnamed MCRN destroyer
 
 class StealthDestroyer(Ship): #Banshee (only in that tabletop game, not in the books or TV show)
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=60, height=26, armor=15, hull=140, max_speed=170, jerk=0.7, is_player=is_player, team="red")
+        super().__init__(x, y, length=60, height=26, armor=15, hull=340, max_speed=170, jerk=0.7, is_player=is_player, team="red")
         self.ship_type = "MCRN Banshee-Class"
         self.is_stealth = True
         pdc_offsets = [pygame.Vector2(24, 0), pygame.Vector2(10, -11), pygame.Vector2(10, 11), pygame.Vector2(-6, -11), pygame.Vector2(-6, 11), pygame.Vector2(-22, -6), pygame.Vector2(-22, 6)]
@@ -818,7 +818,7 @@ class StealthDestroyer(Ship): #Banshee (only in that tabletop game, not in the b
 
 class StrikeCruiser(Ship): #Raptor
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=76, height=32, armor=22, hull=240, max_speed=120, jerk=0.45, is_player=is_player, team="red")
+        super().__init__(x, y, length=76, height=32, armor=55, hull=550, max_speed=120, jerk=0.45, is_player=is_player, team="red")
         self.ship_type = "MCRN Raptor-Class"
         pdc_offsets = [pygame.Vector2(32, 0), pygame.Vector2(14, -14), pygame.Vector2(14, 14), pygame.Vector2(-6, -14), pygame.Vector2(-6, 14), pygame.Vector2(-30, -8), pygame.Vector2(-30, 8)]
         railgun_offsets = []
@@ -839,7 +839,7 @@ class StrikeCruiser(Ship): #Raptor
 
 class AssaultCruiser(Ship): #Scirocco
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=84, height=36, armor=28, hull=600, max_speed=100, jerk=0.35, is_player=is_player, team="red")
+        super().__init__(x, y, length=84, height=36, armor=75, hull=725, max_speed=100, jerk=0.35, is_player=is_player, team="red")
         self.ship_type = "MCRN Scirocco-Class"
         pdc_offsets = [pygame.Vector2(36, 0), pygame.Vector2(16, -16), pygame.Vector2(16, 16), pygame.Vector2(-8, -16), pygame.Vector2(-8, 16), pygame.Vector2(-34, -10), pygame.Vector2(-34, 10)]
         railgun_offsets = [pygame.Vector2(16, 0)]
@@ -852,7 +852,7 @@ class AssaultCruiser(Ship): #Scirocco
 
 class RedBattleship(Ship): # Donnager
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=96, height=40, armor=35, hull=800, max_speed=90, jerk=0.3, is_player=is_player, team="red")
+        super().__init__(x, y, length=96, height=40, armor=100, hull=1110, max_speed=90, jerk=0.3, is_player=is_player, team="red")
         self.ship_type = "MCRN Donnager-Class"
         pdc_offsets = [pygame.Vector2(42, 0), pygame.Vector2(18, -18), pygame.Vector2(18, 18), pygame.Vector2(-8, -18), pygame.Vector2(-8, 18), pygame.Vector2(-40, -12), pygame.Vector2(-40, 12)]
         railgun_offsets = [pygame.Vector2(18, -6), pygame.Vector2(18, 6)]
@@ -865,7 +865,7 @@ class RedBattleship(Ship): # Donnager
 
 class RedBattleshipRefit(Ship): # Harman Dae-Jung
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=96, height=40, armor=35, hull=820, max_speed=95, jerk=0.3, is_player=is_player, team="red")
+        super().__init__(x, y, length=96, height=40, armor=110, hull=1100, max_speed=95, jerk=0.3, is_player=is_player, team="red")
         self.ship_type = "MCRN Refit Donnager-Class"
         pdc_offsets = [pygame.Vector2(42, 0), pygame.Vector2(18, -18), pygame.Vector2(18, 18), pygame.Vector2(-8, -18), pygame.Vector2(-8, 18), pygame.Vector2(-40, -12), pygame.Vector2(-40, 12)]
         railgun_offsets = [pygame.Vector2(18, -10), pygame.Vector2(18, -4), pygame.Vector2(18, 4), pygame.Vector2(18, 10)]
@@ -880,20 +880,20 @@ class RedBattleshipRefit(Ship): # Harman Dae-Jung
 # UNN
 class Gunship(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=30, height=14, armor=4, hull=70, max_speed=240, jerk=0.85, is_player=is_player, team="blue")
+        super().__init__(x, y, length=30, height=14, armor=6, hull=70, max_speed=240, jerk=0.85, is_player=is_player, team="blue")
         self.ship_type = "UNN Gunship"
         pdc_offsets = [pygame.Vector2(12, 0), pygame.Vector2(0, -6), pygame.Vector2(0, 6), pygame.Vector2(-10, -4), pygame.Vector2(-10, 4)]
         railgun_offsets = []
         self.pdcs = [PDC(self, offset=offset, is_player=is_player) for offset in pdc_offsets]
         self.railguns = [RailgunWeapon(self, offset=offset, is_player=is_player) for offset in railgun_offsets]
-        self.ammo = {'light': 6, 'medium': 0, 'heavy': 0, 'nuke': 0}
-        self.burst_config = {'count': 6, 'interval': 12, 'per_burst': ['light']}
+        self.ammo = {'light': 8, 'medium': 0, 'heavy': 0, 'nuke': 0}
+        self.burst_config = {'count': 8, 'interval': 12, 'per_burst': ['light']}
     def update_player(self, keys): update_player_ship(self, keys)
     def update_ai(self, target_pos, target_obj, missiles_group): update_ai_ship(self, target_pos, target_obj, missiles_group)
 
 class Escort(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=42, height=18, armor=8, hull=110, max_speed=190, jerk=0.7, is_player=is_player, team="blue")
+        super().__init__(x, y, length=42, height=18, armor=10, hull=110, max_speed=190, jerk=0.7, is_player=is_player, team="blue")
         self.ship_type = "UNN Phantom-Class"
         pdc_offsets = [pygame.Vector2(18, 0), pygame.Vector2(6, -8), pygame.Vector2(6, 8), pygame.Vector2(-6, -8), pygame.Vector2(-6, 8), pygame.Vector2(-16, -4), pygame.Vector2(-16, 4)]
         railgun_offsets = []
@@ -906,21 +906,21 @@ class Escort(Ship):
 
 class TorpedoBoat(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=46, height=20, armor=10, hull=100, max_speed=180, jerk=0.7, is_player=is_player, team="blue")
+        super().__init__(x, y, length=46, height=20, armor=15, hull=150, max_speed=180, jerk=0.7, is_player=is_player, team="blue")
         self.ship_type = "Torpedo Boat"
         pdc_offsets = [pygame.Vector2(20, 0), pygame.Vector2(6, -9), pygame.Vector2(6, 9), pygame.Vector2(-6, -9), pygame.Vector2(-6, 9), pygame.Vector2(-18, -4), pygame.Vector2(-18, 4)]
         railgun_offsets = []
         self.pdcs = [PDC(self, offset=offset, is_player=is_player) for offset in pdc_offsets]
         self.railguns = [RailgunWeapon(self, offset=offset, is_player=is_player) for offset in railgun_offsets]
         self.missile_payload = ['light', 'light', 'light', 'light', 'medium', 'medium', 'medium', 'medium']
-        self.ammo = {'light': 14, 'medium': 14, 'heavy': 0, 'nuke': 0}
+        self.ammo = {'light': 24, 'medium': 24, 'heavy': 0, 'nuke': 0}
         self.missile_cooldown = 0
     def update_player(self, keys): update_player_ship(self, keys)
     def update_ai(self, target_pos, target_obj, missiles_group): update_ai_ship(self, target_pos, target_obj, missiles_group)
 
 class BlueFrigate(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=56, height=24, armor=15, hull=150, max_speed=150, jerk=0.6, is_player=is_player, team="blue")
+        super().__init__(x, y, length=56, height=24, armor=22.5, hull=210, max_speed=150, jerk=0.6, is_player=is_player, team="blue")
         self.ship_type = "UNN Frigate"
         pdc_offsets = [pygame.Vector2(24, 0), pygame.Vector2(8, -10), pygame.Vector2(8, 10), pygame.Vector2(-6, -10), pygame.Vector2(-6, 10), pygame.Vector2(-22, -6), pygame.Vector2(-22, 6)]
         railgun_offsets = []
@@ -934,7 +934,7 @@ class BlueFrigate(Ship):
 
 class BlueDestroyer(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=64, height=28, armor=20, hull=200, max_speed=130, jerk=0.5, is_player=is_player, team="blue")
+        super().__init__(x, y, length=64, height=28, armor=35, hull=320, max_speed=130, jerk=0.5, is_player=is_player, team="blue")
         self.ship_type = "UNN Monroe-Class"
         pdc_offsets = [pygame.Vector2(28, 0), pygame.Vector2(10, -12), pygame.Vector2(10, 12), pygame.Vector2(-6, -12), pygame.Vector2(-6, 12), pygame.Vector2(-26, -8), pygame.Vector2(-26, 8)]
         railgun_offsets = [pygame.Vector2(12, -4), pygame.Vector2(12, 4)]
@@ -948,7 +948,7 @@ class BlueDestroyer(Ship):
 
 class BlueBattleship(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=90, height=38, armor=30, hull=350, max_speed=80, jerk=0.25, is_player=is_player, team="blue")
+        super().__init__(x, y, length=90, height=38, armor=45, hull=550, max_speed=80, jerk=0.25, is_player=is_player, team="blue")
         self.ship_type = "UNN Battleship"
         self.is_blue_battleship = True
         self.cannot_fire_while_accelerating = True
@@ -964,7 +964,7 @@ class BlueBattleship(Ship):
 
 class CommandShip(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=98, height=42, armor=40, hull=800, max_speed=100, jerk=0.35, is_player=is_player, team="blue")
+        super().__init__(x, y, length=98, height=42, armor=65, hull=800, max_speed=105, jerk=0.35, is_player=is_player, team="blue")
         self.ship_type = "UNN Command Ship"
         pdc_offsets = [pygame.Vector2(44, 0), pygame.Vector2(18, -18), pygame.Vector2(18, 18), pygame.Vector2(-8, -18), pygame.Vector2(-8, 18), pygame.Vector2(-42, -12), pygame.Vector2(-42, 12)]
         railgun_offsets = [pygame.Vector2(18, -4), pygame.Vector2(18, 4)]
@@ -978,7 +978,7 @@ class CommandShip(Ship):
 
 class Dreadnought(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=106, height=46, armor=50, hull=600, max_speed=85, jerk=0.25, is_player=is_player, team="blue")
+        super().__init__(x, y, length=106, height=46, armor=80, hull=950, max_speed=85, jerk=0.25, is_player=is_player, team="blue")
         self.ship_type = "UNN Dreadnought"
         pdc_offsets = [pygame.Vector2(48, 0), pygame.Vector2(20, -20), pygame.Vector2(20, 20), pygame.Vector2(-10, -20), pygame.Vector2(-10, 20), pygame.Vector2(-46, -14), pygame.Vector2(-46, 14)]
         railgun_offsets = [pygame.Vector2(20, -6), pygame.Vector2(20, 6)]
@@ -992,7 +992,7 @@ class Dreadnought(Ship):
 
 class DreadnoughtRefit(Ship):
     def __init__(self, x, y, is_player=True):
-        super().__init__(x, y, length=106, height=46, armor=50, hull=650, max_speed=95, jerk=0.3, is_player=is_player, team="blue")
+        super().__init__(x, y, length=106, height=46, armor=87.5, hull=1050, max_speed=95, jerk=0.3, is_player=is_player, team="blue")
         self.ship_type = "UNN Dreadnought Refit"
         pdc_offsets = [pygame.Vector2(48, 0), pygame.Vector2(20, -20), pygame.Vector2(20, 20), pygame.Vector2(-10, -20), pygame.Vector2(-10, 20), pygame.Vector2(-46, -14), pygame.Vector2(-46, 14)]
         railgun_offsets = [pygame.Vector2(20, -6), pygame.Vector2(20, 6)]
