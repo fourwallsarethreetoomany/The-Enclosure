@@ -3,7 +3,7 @@ import random
 import pygame
 import asyncio
 # a few notes: each pixel represents 10 meters, this is so that you can actually tell what is going on. Second, we are capping ships to a maximum speed of 500 meters per second because no human player can track that fast
-pygame.init() # to fucking do bozo: fix pdc collisoins so that they can damage the bridge, make sure each ship has the right amount of pdcs, rework armor. maybe just maybe give the CPU ships an actual AI, Hell naw!
+pygame.init() 
 HEIGHT = 800
 WIDTH  = 1280
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -1302,7 +1302,7 @@ async def main():
                                     if en.hull == 0:
                                         en.take_damage(1, weapon_name="PDC", attacker_pos=round_obj.pos - round_obj.velocity)
                                     else: 
-                                        en.hull = max(0.1, en.hull - max(1, 1 - en.armor))
+                                        en.hull = max(0, en.hull - max(1, 1 - en.armor))
                                     round_obj.kill()
                                     hit_enemy = True
                                     break
