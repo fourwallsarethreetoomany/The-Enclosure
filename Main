@@ -1080,7 +1080,6 @@ class DreadnoughtRefit(Ship):
                           pygame.Vector2(4,4), pygame.Vector2(4,-4),
                           pygame.Vector2(12,12), pygame.Vector2(12,-12)]
         railgun_offsets = [pygame.Vector2(20, 0), pygame.Vector2(20, 0)]
-        railgun_offsets = [pygame.Vector2(20, 0), pygame.Vector2(20, 0)]
         self.pdcs = [PDC(self, offset=offset, is_player=is_player) for offset in pdc_offsets]
         self.railguns = [RailgunWeapon(self, offset=offset, is_player=is_player) for offset in railgun_offsets]
         self.missile_payload = ['light']*12 + ['medium']*6 + ['heavy']*4 + ['nuke', 'nuke']
